@@ -1,6 +1,13 @@
 import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 import { createGqlResponseSchema, gqlResponseSchema } from './schemas.js';
-import { graphql, GraphQLObjectType, GraphQLSchema } from 'graphql';
+import {
+  DocumentNode,
+  graphql,
+  GraphQLObjectType,
+  GraphQLSchema,
+  parse,
+  validate,
+} from 'graphql';
 import {
   changePost,
   createPost,
@@ -24,6 +31,7 @@ import {
   getUser,
 } from './resolvers/user.js';
 import { subscribeTo, unsubscribeFrom } from './resolvers/subscribe.js';
+import depthLimit from 'graphql-depth-limit';
 
 const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -69,11 +77,22 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         200: gqlResponseSchema,
       },
     },
-    async handler(req) {
+    async handler(req, reply) {
       const { query, variables } = req.body as {
         query: string;
         variables?: Record<string, unknown>;
       };
+
+      const documentAST: DocumentNode = parse(query);
+
+      const validationErrors = validate(schema, documentAST, [depthLimit(5)]);
+
+      if (validationErrors.length > 0) {
+        await reply.status(400).send({
+          errors: validationErrors,
+        });
+        return;
+      }
 
       return graphql({
         schema,
