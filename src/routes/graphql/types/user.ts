@@ -1,4 +1,11 @@
-import { GraphQLFloat, GraphQLList, GraphQLObjectType, GraphQLString } from 'graphql';
+import {
+  GraphQLFloat,
+  GraphQLInputObjectType,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLString,
+} from 'graphql';
 import { UUIDType } from './uuid.js';
 import { getPostsByParentId } from '../resolvers/post.js';
 import { getProfileByParentId } from '../resolvers/profile.js';
@@ -34,5 +41,21 @@ export const userType: GraphQLObjectType = new GraphQLObjectType({
         return subscribers.map((el) => el.subscriber);
       },
     },
+  }),
+});
+
+export const CreateUserInput: GraphQLInputObjectType = new GraphQLInputObjectType({
+  name: 'CreateUserInput',
+  fields: () => ({
+    name: { type: new GraphQLNonNull(GraphQLString) },
+    balance: { type: new GraphQLNonNull(GraphQLFloat) },
+  }),
+});
+
+export const ChangeUserInput: GraphQLInputObjectType = new GraphQLInputObjectType({
+  name: 'ChangeUserInput',
+  fields: () => ({
+    name: { type: GraphQLString },
+    balance: { type: GraphQLFloat },
   }),
 });

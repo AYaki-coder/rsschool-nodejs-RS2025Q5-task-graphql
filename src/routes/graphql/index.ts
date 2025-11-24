@@ -1,10 +1,29 @@
 import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 import { createGqlResponseSchema, gqlResponseSchema } from './schemas.js';
 import { graphql, GraphQLObjectType, GraphQLSchema } from 'graphql';
-import { getAllPosts, getPost } from './resolvers/post.js';
+import {
+  changePost,
+  createPost,
+  deletePost,
+  getAllPosts,
+  getPost,
+} from './resolvers/post.js';
 import { getAllMemberTypes, getMemberType } from './resolvers/member-type.js';
-import { getALLProfiles, getProfile } from './resolvers/profile.js';
-import { getALLUsers, getUser } from './resolvers/user.js';
+import {
+  changeProfile,
+  createProfile,
+  deleteProfile,
+  getALLProfiles,
+  getProfile,
+} from './resolvers/profile.js';
+import {
+  changeUser,
+  createUser,
+  deleteUser,
+  getALLUsers,
+  getUser,
+} from './resolvers/user.js';
+import { subscribeTo, unsubscribeFrom } from './resolvers/subscribe.js';
 
 const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -18,6 +37,22 @@ const schema = new GraphQLSchema({
       memberType: getMemberType,
       profile: getProfile,
       profiles: getALLProfiles,
+    },
+  }),
+  mutation: new GraphQLObjectType({
+    name: 'Mutation',
+    fields: {
+      createUser: createUser,
+      createProfile: createProfile,
+      createPost: createPost,
+      changePost: changePost,
+      changeProfile: changeProfile,
+      changeUser: changeUser,
+      deleteUser: deleteUser,
+      deletePost: deletePost,
+      deleteProfile: deleteProfile,
+      subscribeTo: subscribeTo,
+      unsubscribeFrom: unsubscribeFrom,
     },
   }),
 });

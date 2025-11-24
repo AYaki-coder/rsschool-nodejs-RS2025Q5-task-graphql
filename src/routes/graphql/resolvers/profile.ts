@@ -1,6 +1,6 @@
-import { GraphQLList } from 'graphql';
+import { GraphQLList, GraphQLString } from 'graphql';
 import { MyContext } from '../types/common.js';
-import { profileType } from '../types/profile.js';
+import { changeProfileInput, createProfileInput, profileType } from '../types/profile.js';
 import { UUIDType } from '../types/uuid.js';
 
 export const getALLProfiles = {
@@ -32,5 +32,62 @@ export const getProfileByParentId = {
     });
 
     return profile ?? null;
+  },
+};
+
+export const createProfile = {
+  type: profileType,
+  args: {
+    dto: { type: createProfileInput },
+  },
+  resolve: async (
+    _parent,
+    _args: {
+      dto: { isMale: boolean; yearOfBirth: number; memberTypeId: string; userId: string };
+    },
+    _context: MyContext,
+  ) => {
+    return await _context.prisma.profile.create({ data: _args.dto });
+  },
+};
+
+export const changeProfile = {
+  type: profileType,
+  args: {
+    id: { type: UUIDType },
+    dto: { type: changeProfileInput },
+  },
+  resolve: async (
+    _parent,
+    _args: {
+      id: string;
+      dto: { isMale: boolean; yearOfBirth: number; memberTypeId: string };
+    },
+    _context: MyContext,
+  ) => {
+    return await _context.prisma.profile.update({
+      where: { id: _args.id },
+      data: _args.dto,
+    });
+  },
+};
+
+export const deleteProfile = {
+  type: GraphQLString,
+  args: {
+    id: { type: UUIDType },
+  },
+  resolve: async (
+    _parent,
+    _args: {
+      id: string;
+    },
+    _context: MyContext,
+  ) => {
+    await _context.prisma.profile.delete({
+      where: { id: _args.id },
+    });
+
+    return 'deleted';
   },
 };

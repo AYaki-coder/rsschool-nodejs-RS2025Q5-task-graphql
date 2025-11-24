@@ -1,5 +1,5 @@
-import { GraphQLList } from 'graphql';
-import { userType } from '../types/user.js';
+import { GraphQLList, GraphQLString } from 'graphql';
+import { ChangeUserInput, CreateUserInput, userType } from '../types/user.js';
 import { MyContext } from '../types/common.js';
 import { UUIDType } from '../types/uuid.js';
 
@@ -21,5 +21,50 @@ export const getUser = {
     });
 
     return user ?? null;
+  },
+};
+
+export const createUser = {
+  type: userType,
+  args: {
+    dto: { type: CreateUserInput },
+  },
+  resolve: async (
+    _,
+    _args: { dto: { balance: number; name: string } },
+    _context: MyContext,
+  ) => {
+    return await _context.prisma.user.create({ data: _args.dto });
+  },
+};
+
+export const changeUser = {
+  type: userType,
+  args: {
+    id: { type: UUIDType },
+    dto: { type: ChangeUserInput },
+  },
+  resolve: async (
+    _,
+    _args: { dto: { balance: number; name: string }; id: string },
+    _context: MyContext,
+  ) => {
+    return await _context.prisma.user.update({
+      where: { id: _args.id },
+      data: _args.dto,
+    });
+  },
+};
+
+export const deleteUser = {
+  type: GraphQLString,
+  args: {
+    id: { type: UUIDType },
+  },
+  resolve: async (_, _args: { id: string }, _context: MyContext) => {
+    await _context.prisma.user.delete({
+      where: { id: _args.id },
+    });
+    return 'deleted';
   },
 };
