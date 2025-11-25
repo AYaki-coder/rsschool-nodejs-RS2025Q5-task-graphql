@@ -27,10 +27,6 @@ export const getMemberType = {
 export const getMemberTypeByParentId = {
   type: memberType,
   resolve: async (_parent: { memberTypeId: string }, _args, _context: MyContext) => {
-    const memberType = await _context.prisma.memberType.findUnique({
-      where: { id: _parent.memberTypeId },
-    });
-
-    return memberType ?? null;
+    return _context.loader.memberTypes.load(_parent.memberTypeId);
   },
 };

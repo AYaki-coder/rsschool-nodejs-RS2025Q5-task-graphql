@@ -22,23 +22,13 @@ export const userType: GraphQLObjectType = new GraphQLObjectType({
     userSubscribedTo: {
       type: new GraphQLList(userType),
       resolve: async (_parent: { id: string }, _args, _context: MyContext) => {
-        const authors = await _context.prisma.subscribersOnAuthors.findMany({
-          where: { subscriberId: _parent.id },
-          include: { author: true },
-        });
-
-        return authors.map((el) => el.author);
+        return _context.loader.userSubscribedTo.load(_parent.id);
       },
     },
     subscribedToUser: {
       type: new GraphQLList(userType),
       resolve: async (_parent: { id: string }, _args, _context: MyContext) => {
-        const subscribers = await _context.prisma.subscribersOnAuthors.findMany({
-          where: { authorId: _parent.id },
-          include: { subscriber: true },
-        });
-
-        return subscribers.map((el) => el.subscriber);
+        return _context.loader.subscribedToUser.load(_parent.id);
       },
     },
   }),

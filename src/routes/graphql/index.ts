@@ -32,6 +32,7 @@ import {
 } from './resolvers/user.js';
 import { subscribeTo, unsubscribeFrom } from './resolvers/subscribe.js';
 import depthLimit from 'graphql-depth-limit';
+import { genLoader } from './loader/loader.js';
 
 const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -97,7 +98,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       return graphql({
         schema,
         source: query,
-        contextValue: { prisma },
+        contextValue: { prisma, loader: genLoader(prisma) },
         variableValues: variables,
       });
     },

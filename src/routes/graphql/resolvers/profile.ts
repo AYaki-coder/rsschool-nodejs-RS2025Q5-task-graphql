@@ -27,11 +27,7 @@ export const getProfile = {
 export const getProfileByParentId = {
   type: profileType,
   resolve: async (_parent: { id: string }, _args, _context: MyContext) => {
-    const profile = await _context.prisma.profile.findUnique({
-      where: { userId: _parent.id },
-    });
-
-    return profile ?? null;
+    return _context.loader.profiles.load(_parent.id);
   },
 };
 

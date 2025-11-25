@@ -25,11 +25,7 @@ export const getPost = {
 export const getPostsByParentId = {
   type: new GraphQLList(postType),
   resolve: async (_parent: { id: string }, _args, _context: MyContext) => {
-    const post = await _context.prisma.post.findMany({
-      where: { authorId: _parent.id },
-    });
-
-    return post ?? null;
+    return _context.loader.posts.load(_parent.id);
   },
 };
 
